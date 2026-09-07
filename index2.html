@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJonny Shop - Delivery Partner Premium</title>
+    
+    <!-- Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* MAIN ORANGE THEME */
+            --theme-primary: #FF6D00; 
+            --theme-dark: #E65100; 
+            --theme-gradient: linear-gradient(135deg, #FF8F00 0%, #E65100 100%);
+            
+            --bg-light: #f0f4f8;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            /* 3D Shadows */
+            --shadow-soft: 8px 8px 16px rgba(0,0,0,0.06), -8px -8px 16px rgba(255,255,255,0.8);
+            --shadow-inset: inset 4px 4px 8px rgba(0,0,0,0.04), inset -4px -4px 8px rgba(255,255,255,0.8);
+            --shadow-float: 0 12px 25px rgba(255, 109, 0, 0.25);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- AUTH & ONBOARDING --- */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--theme-gradient);
+            padding: 20px;
+        }
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            padding: 35px;
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        .scrollable-form {
+            max-height: 55vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 10px;
+        }
+        .scrollable-form::-webkit-scrollbar { width: 5px; }
+        .scrollable-form::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* --- LAYOUTS --- */
+        .app-view { display: none; }
+        .app-view.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .main-content {
+            padding: 15px;
+            padding-bottom: 120px;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* --- 3D FLOATING BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: calc(100% - 40px); max-width: 500px; background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-radius: 35px; box-shadow: 0 15px 35px rgba(0,0,0,0.1), inset 0 2px 2px rgba(255,255,255,1);
+            z-index: 1000; display: flex; justify-content: space-between; padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .bottom-nav a {
+            flex: 1; text-align: center; color: #94a3b8; text-decoration: none;
+            font-size: 10px; font-weight: 600; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; align-items: center; padding: 10px 0;
+            border-radius: 25px; position: relative;
+        }
+        .bottom-nav i { display: block; font-size: 22px; margin-bottom: 4px; transition: all 0.3s ease; }
+        
+        .bottom-nav a.active { 
+            color: var(--theme-primary); background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            box-shadow: 5px 5px 12px rgba(0,0,0,0.06), -5px -5px 12px rgba(255,255,255,0.9);
+            transform: translateY(-8px);
+        }
+        .bottom-nav a.active i { transform: scale(1.15); color: var(--theme-primary); filter: drop-shadow(0 4px 6px rgba(255, 109, 0, 0.3)); }
+
+        /* --- HEADER & STATS --- */
+        .mobile-header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px);
+            padding: 15px 24px; border-radius: 20px; 
+            margin-top: 35px; /* Brought the header down a bit */
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15), inset 0 1px 1px rgba(255,255,255,0.1);
+            position: sticky; top: 35px; /* Adjusted sticky position down */
+            z-index: 100; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-card {
+            background: #ffffff; border-radius: 24px; padding: 24px 15px; box-shadow: var(--shadow-soft);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;
+            border: 1px solid rgba(255,255,255,0.6); transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+
+        /* --- BUTTONS --- */
+        .btn-theme { background: var(--theme-gradient); color: white; border: none; box-shadow: var(--shadow-float); transition: all 0.3s ease; }
+        .btn-theme:hover, .btn-theme:active { background: linear-gradient(135deg, #E65100 0%, #FF8F00 100%); transform: translateY(2px); box-shadow: 0 5px 15px rgba(255, 109, 0, 0.2); color: white; }
+
+        /* --- FINANCE 3D CARD --- */
+        .finance-card-3d {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 28px; padding: 30px;
+            color: white; box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 2px 2px rgba(255,255,255,0.1);
+            position: relative; overflow: hidden; text-align: center;
+        }
+        .finance-card-3d::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg); animation: shine 4s infinite;
+        }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+
+        /* --- DELIVERY CARDS (3D Hover Look) --- */
+        .delivery-card {
+            background: white; border-radius: 20px; padding: 20px; border-left: 6px solid var(--theme-primary);
+            box-shadow: var(--shadow-soft); margin-bottom: 20px; animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-top: 1px solid rgba(255,255,255,0.8);
+        }
+        .location-track { position: relative; padding-left: 24px; margin: 18px 0; }
+        .location-track::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; border-left: 2px dashed #cbd5e1; }
+        .loc-point { position: relative; margin-bottom: 18px; }
+        .loc-point i { position: absolute; left: -31px; top: 2px; background: white; font-size: 16px; padding: 2px; }
+
+        /* --- PREMIUM SWIPE TO ACTION COMPONENT --- */
+        .swipe-container {
+            position: relative; width: 100%; height: 64px; background: var(--theme-gradient); border-radius: 32px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1), var(--shadow-float); margin-top: 25px;
+        }
+        .swipe-overlay { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: rgba(255, 255, 255, 0.25); z-index: 1; border-radius: 32px 0 0 32px; }
+        .swipe-text { font-weight: 800; font-size: 13px; letter-spacing: 1.5px; z-index: 1; user-select: none; pointer-events: none; background: linear-gradient(90deg, rgba(255,255,255,0.7) 0%, #ffffff 50%, rgba(255,255,255,0.7) 100%); background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text; animation: shimmerText 2.5s linear infinite; }
+        @keyframes shimmerText { to { background-position: -200% center; } }
+        .swipe-thumb {
+            position: absolute; left: 6px; top: 6px; width: 52px; height: 52px; background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--theme-primary); font-size: 22px;
+            box-shadow: 3px 3px 6px #d1d9e6, -3px -3px 6px #ffffff; z-index: 2; cursor: grab; transition: transform 0.1s ease-out;
+        }
+        .swipe-thumb:active { cursor: grabbing; box-shadow: inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff; }
+
+        .swipe-container.reject { background: linear-gradient(135deg, #fecaca 0%, #f87171 100%); box-shadow: inset 0 2px 5px rgba(0,0,0,0.05), 0 10px 20px rgba(239, 68, 68, 0.2); height: 58px; }
+        .swipe-container.rtl-swipe .swipe-overlay { left: auto; right: 0; border-radius: 0 32px 32px 0; background: rgba(239, 68, 68, 0.2); }
+        .swipe-container.reject .swipe-text { background: linear-gradient(90deg, rgba(153, 27, 27, 0.6) 0%, #7f1d1d 50%, rgba(153, 27, 27, 0.6) 100%); background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text; }
+        .swipe-container.rtl-swipe .swipe-thumb { left: auto; right: 6px; }
+        .swipe-container.reject .swipe-thumb { width: 46px; height: 46px; top: 6px; background: linear-gradient(145deg, #ef4444, #dc2626); color: white; box-shadow: -3px 3px 8px rgba(153, 27, 27, 0.4); font-size: 18px; }
+
+        /* --- PREMIUM PROFILE UI --- */
+        .profile-header-card { background: #ffffff; border-radius: 24px; padding: 30px 20px; box-shadow: var(--shadow-soft); text-align: center; margin-bottom: 25px; position: relative; border-top: 1px solid white; }
+        .profile-avatar { width: 90px; height: 90px; background: linear-gradient(145deg, #ffffff, #f0f4f8); box-shadow: 6px 6px 12px rgba(0,0,0,0.06), -6px -6px 12px white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: var(--theme-primary); font-size: 38px; }
+        .info-card { background: #ffffff; border-radius: 24px; padding: 24px; box-shadow: var(--shadow-soft); margin-bottom: 25px; }
+
+        .form-switch .form-check-input { width: 3.5em; height: 1.8em; background-color: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); cursor: pointer; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+        .form-switch .form-check-input:checked { background-color: var(--success); border-color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+
+        .form-control, .form-select { border-radius: 16px; padding: 14px 18px; border: 1px solid #e2e8f0; background-color: #f8fafc; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); font-size: 14px; transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { background-color: #fff; border-color: var(--theme-primary); box-shadow: 0 0 0 4px rgba(255, 109, 0, 0.1); }
+
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--theme-gradient); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.3); border-top: 5px solid white; border-radius: 50%; animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ========================================================
+           UPDATE MODAL (UI/UX 3D DESIGN BASED ON IMAGE)
+           ======================================================== */
+        .update-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 109, 0, 0.85); /* Premium translucent orange background */
+            backdrop-filter: blur(8px);
+            z-index: 100000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .update-modal-overlay.show { display: flex; opacity: 1; }
+        
+        .update-modal-card {
+            background: #ffffff; width: 90%; max-width: 360px;
+            border-radius: 30px; padding: 40px 24px 30px; text-align: center;
+            position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+            transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .update-modal-overlay.show .update-modal-card { transform: scale(1); }
+        
+        .update-close-btn {
+            position: absolute; top: 16px; right: 16px;
+            background: #fff0e6; color: #ff6d00;
+            border: none; width: 34px; height: 34px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; cursor: pointer; transition: 0.2s;
+        }
+        .update-close-btn:hover { background: #ffe0cc; }
+        
+        .update-img-container {
+            position: relative; margin: -70px auto 15px; width: 160px;
+        }
+        .update-img-container img {
+            position: relative; z-index: 1; height: 160px; object-fit: contain;
+            filter: drop-shadow(0 15px 25px rgba(255,109,0,0.3));
+            animation: floatUp 2.5s infinite ease-in-out alternate;
+        }
+        @keyframes floatUp { 0% { transform: translateY(0px) rotate(-2deg); } 100% { transform: translateY(-12px) rotate(2deg); } }
+        
+        .update-title { font-weight: 800; font-size: 26px; color: #1e293b; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .update-subtitle { color: #64748b; font-size: 14px; margin-bottom: 25px; line-height: 1.5; padding: 0 10px; font-weight: 500; }
+        
+        .update-version-box {
+            background: #fff5ec; border-radius: 20px; padding: 18px;
+            display: flex; align-items: center; gap: 14px;
+            text-align: left; margin-bottom: 28px;
+        }
+        .uv-icon {
+            width: 48px; height: 48px; background: #ff6d00; color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0; box-shadow: 0 6px 15px rgba(255, 109, 0, 0.35);
+        }
+        .uv-text h6 { margin: 0 0 4px 0; font-weight: 700; color: #1e293b; font-size: 15px; }
+        .uv-text p { margin: 0; font-size: 12px; color: #64748b; line-height: 1.4; font-weight: 500; }
+        
+        .btn-update {
+            background: #ff6d00; color: white; font-family: 'Poppins', sans-serif;
+            font-weight: 700; font-size: 16px; border-radius: 100px; padding: 16px;
+            border: none; box-shadow: 0 10px 25px rgba(255, 109, 0, 0.35); transition: 0.3s;
+        }
+        .btn-update:hover { box-shadow: 0 12px 30px rgba(255, 109, 0, 0.5); transform: translateY(-3px); color: white;}
+    </style>
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <h3 class="mt-4 text-white fw-bold" style="letter-spacing: 1px;">AJonny Driver</h3>
+    </div>
+
+    <!-- 1. AUTHENTICATION & ONBOARDING VIEW -->
+    <div id="authView" class="app-view auth-container">
+        <div class="auth-card">
+            <div class="text-center mb-4">
+                <!-- Replaced broken logo image with Image link URL -->
+                <img src="https://placehold.co/200x80/FF6D00/FFFFFF?text=AJonny+Shop" alt="AJonny" style="height: 80px; object-fit: contain; margin-bottom: 15px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                <h4 class="fw-bold text-dark">Partner Panel</h4>
+                <p class="text-muted small">Deliver orders & earn money</p>
+            </div>
+
+            <ul class="nav nav-pills nav-justified mb-4 p-1 bg-light rounded-pill border" id="authTabs">
+                <li class="nav-item"><button class="nav-link active rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#loginTab">Login</button></li>
+                <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#applyTab">Register</button></li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Login -->
+                <div class="tab-pane fade show active" id="loginTab">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <input type="email" class="form-control" id="loginEmail" placeholder="Email Address" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn btn-theme w-100 py-3 fw-bold rounded-pill fs-6">Login to Dashboard</button>
+                    </form>
+                </div>
+
+                <!-- Driver Application KYC -->
+                <div class="tab-pane fade" id="applyTab">
+                    <form id="driverApplyForm" class="scrollable-form pe-2">
+                        <h6 class="fw-bold text-primary mb-3">Personal Details</h6>
+                        <input type="text" class="form-control mb-3" id="d_name" placeholder="Full Name" required>
+                        <input type="tel" class="form-control mb-3" id="d_mobile" placeholder="Mobile Number" required>
+                        <input type="email" class="form-control mb-3" id="d_email" placeholder="Email Address" required>
+                        <label class="form-label small text-muted ms-1 mb-1">Date of Birth</label>
+                        <input type="date" class="form-control mb-3" id="d_dob" required>
+                        <textarea class="form-control mb-3" id="d_address" placeholder="Full Residential Address" rows="2" required></textarea>
+                        
+                        <h6 class="fw-bold text-primary mb-3 mt-4">Vehicle Details</h6>
+                        <select class="form-select mb-3" id="d_vehicleType" required>
+                            <option value="">Select Vehicle Type</option>
+                            <option value="Bike">Bike / Two Wheeler</option>
+                            <option value="EV">Electric Vehicle</option>
+                        </select>
+                        <input type="text" class="form-control mb-3" id="d_vehicleNum" placeholder="Vehicle Reg No." required>
+                        
+                        <h6 class="fw-bold text-primary mb-3 mt-4">Documents & Bank</h6>
+                        <input type="text" class="form-control mb-3" id="d_dl" placeholder="Driving Licence Number" required>
+                        <input type="url" class="form-control mb-3" id="d_rc" placeholder="Vehicle RC Document URL">
+                        <input type="text" class="form-control mb-3" id="d_bankUpi" placeholder="Bank A/C or UPI ID" required>
+                        <input type="url" class="form-control mb-3" id="d_kycDoc" placeholder="Aadhaar Document URL" required>
+                        <input type="text" class="form-control mb-3" id="d_emergency" placeholder="Emergency Contact No." required>
+                        <input type="text" class="form-control mb-3" id="d_pan" placeholder="PAN Number">
+                        
+                        <input type="password" class="form-control mb-4 mt-3" id="d_password" placeholder="Create Password" required>
+                        <button type="submit" class="btn btn-dark w-100 py-3 fw-bold rounded-pill">Submit Application</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. PENDING APPROVAL VIEW -->
+    <div id="pendingView" class="app-view auth-container">
+        <div class="auth-card text-center">
+            <div class="profile-avatar mx-auto mb-3" style="width: 100px; height: 100px; font-size: 40px; color: var(--warning);">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <h4 class="fw-bold">KYC Under Review</h4>
+            <p class="text-muted">Your profile is currently being verified by the AJonny Shop Admin team.</p>
+            <div id="rejectionAlert" class="alert alert-danger rounded-4" style="display:none;"></div>
+            <button class="btn btn-outline-secondary w-100 rounded-pill mt-3 py-2 fw-bold" onclick="app.logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- 3. MAIN DRIVER APP VIEW -->
+    <div id="driverView" class="app-view">
+        <div class="main-content">
+            
+            <div class="mobile-header">
+                <!-- Replaced broken logo image with Image link URL -->
+                <img src="https://i.ibb.co/RG5zH3DH/Picsart-26-08-26-00-20-49-360.webp" alt="AJonny" style="height: 45px; border-radius: 10px;">
+                <div class="form-check form-switch fs-3 mb-0">
+                    <input class="form-check-input" type="checkbox" id="driverOnlineToggle" onchange="app.toggleStatus(this.checked)">
+                </div>
+            </div>
+
+            <!-- TAB 1: DUTY / HOME -->
+            <div id="tab_home" class="driver-tab">
+                <div class="row mb-4 g-3">
+                    <div class="col-6">
+                        <div class="stat-card">
+                            <h2 class="mb-0 fw-bold text-dark" id="d_statToday">0</h2>
+                            <small class="text-muted fw-bold text-center mt-1" style="font-size:11px;">DELIVERIES TODAY</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card">
+                            <h2 class="mb-0 fw-bold text-success" id="d_statEarn">₹0</h2>
+                            <small class="text-muted fw-bold text-center mt-1" style="font-size:11px;">EARNED TODAY</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="driverStatusWarning" class="alert alert-danger text-center fw-bold rounded-4 shadow-sm" style="display:none; background: #fff0f1; border: 1px dashed #ffcdd2;">
+                    <i class="fas fa-moon mb-2 fs-2 text-danger"></i><br>You are Offline<br><small class="fw-normal text-muted">Go online from top-right to start receiving orders.</small>
+                </div>
+
+                <div id="availableRequestsSection">
+                    <h5 class="mb-3 fw-bold mt-4 text-dark"><i class="fas fa-satellite-dish text-primary me-2"></i> New Requests</h5>
+                    <div id="driverRequestsList">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                            <p class="text-muted fw-bold mb-0">Scanning for orders...</p>
+                            <small class="text-muted">Stay in this area for faster assignment.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 1.5: ACTIVE JOBS -->
+            <div id="tab_active" class="driver-tab" style="display: none;">
+                <h5 class="mb-3 fw-bold text-dark"><i class="fas fa-bolt text-warning me-2"></i> Active Jobs (<span id="activeJobCount">0</span>)</h5>
+                <div id="activeDeliveriesContainer"></div>
+            </div>
+
+            <!-- TAB 2: HISTORY -->
+            <div id="tab_history" class="driver-tab" style="display: none;">
+                <h5 class="mb-4 fw-bold text-dark"><i class="fas fa-history text-secondary me-2"></i> Past Deliveries</h5>
+                <div id="driverHistoryList"></div>
+            </div>
+
+            <!-- TAB 3: FINANCE -->
+            <div id="tab_finance" class="driver-tab" style="display: none;">
+                <h5 class="fw-bold mb-4 text-dark"><i class="fas fa-wallet text-success me-2"></i> Finance Dashboard</h5>
+                
+                <ul class="nav nav-pills nav-justified mb-4 p-1 bg-white rounded-pill shadow-sm border" style="box-shadow: var(--shadow-soft) !important;">
+                    <li class="nav-item"><button class="nav-link active rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#earningsTab">Earnings</button></li>
+                    <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#codTab">COD Cash</button></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="earningsTab">
+                        <div class="finance-card-3d mb-4">
+                            <p class="mb-2 fw-medium" style="color: #94a3b8; letter-spacing: 1px;">AVAILABLE BALANCE</p>
+                            <h1 class="fw-bold mb-3 text-white" id="d_walletBalance" style="font-size: 3.5rem;">₹0</h1>
+                            <p class="small mb-4 text-light opacity-75">Earnings: ₹40 per successful delivery</p>
+                            <button class="btn btn-light rounded-pill fw-bold w-100 py-3 text-dark shadow" onclick="app.requestWithdrawal()">
+                                <i class="fas fa-university me-2"></i> Transfer to Bank
+                            </button>
+                        </div>
+                        <h6 class="fw-bold mb-3 text-dark">Payout Transactions</h6>
+                        <div class="list-group list-group-flush rounded-4 shadow-sm" id="driverTransactions" style="background: white;">
+                            <p class="text-muted text-center py-4">No transactions found.</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="codTab">
+                        <div class="finance-card-3d mb-4" style="background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%);">
+                            <p class="mb-2 fw-medium text-danger-emphasis text-light" style="letter-spacing: 1px;"><i class="fas fa-hand-holding-usd"></i> CASH IN HAND (COD)</p>
+                            <h1 class="fw-bold mb-3 text-white" id="d_cashInHand" style="font-size: 3.5rem;">₹0</h1>
+                            <p class="small mb-4 text-light opacity-75">Submit this company cash to admin.</p>
+                            <button class="btn btn-danger rounded-pill fw-bold w-100 py-3 shadow" onclick="app.requestCashHandover()">
+                                Submit Cash to Admin
+                            </button>
+                        </div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <div class="stat-card" style="padding: 15px;">
+                                    <small class="text-muted d-block fw-bold mb-1" style="font-size:10px;">TOTAL COLLECTED</small>
+                                    <h5 class="fw-bold text-dark mb-0" id="d_totalCod">₹0</h5>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card" style="padding: 15px;">
+                                    <small class="text-muted d-block fw-bold mb-1" style="font-size:10px;">CASH SUBMITTED</small>
+                                    <h5 class="fw-bold text-success mb-0" id="d_submittedCash">₹0</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="fw-bold mb-3 text-dark">COD Collection History</h6>
+                        <div class="list-group list-group-flush rounded-4 shadow-sm" id="codHistoryList" style="background: white;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: PROFILE -->
+            <div id="tab_profile" class="driver-tab" style="display: none;">
+                <div class="profile-header-card">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1 text-dark" id="profName">Name</h4>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold mb-2 border border-success border-opacity-25">
+                        <i class="fas fa-shield-alt me-1"></i> KYC Verified Partner
+                    </span>
+                    <p class="text-muted fw-medium mt-2 mb-0" id="profVehicle" style="font-size: 14px;">Vehicle</p>
+                </div>
+
+                <div class="info-card">
+                    <h6 class="fw-bold mb-3 text-dark border-bottom pb-2">Account Information</h6>
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="text-muted small fw-medium">Full Name</span>
+                        <span class="text-dark fw-bold small" id="profNameInfo">-</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="text-muted small fw-medium">Phone Number</span>
+                        <span class="text-dark fw-bold small" id="profMobileInfo">-</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="text-muted small fw-medium">Vehicle</span>
+                        <span class="text-dark fw-bold small" id="profVehicleInfo">-</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h6 class="fw-bold mb-2 text-dark"><i class="fas fa-map-marker-alt text-danger me-2"></i> My Pickup Areas</h6>
+                    <p class="small text-muted mb-3">Add areas to receive specific pickup orders.</p>
+                    
+                    <div class="input-group mb-3 shadow-sm rounded-4 overflow-hidden border">
+                        <input type="text" id="newAreaInput" class="form-control border-0 bg-white" placeholder="e.g. Berhampore">
+                        <button class="btn btn-dark fw-bold px-4" type="button" onclick="app.addPickupArea()">Add</button>
+                    </div>
+                    
+                    <div id="pickupAreasList" class="d-flex flex-wrap gap-2 mb-4"></div>
+                    
+                    <button class="btn btn-theme w-100 rounded-pill py-3 fw-bold" onclick="app.savePickupAreas()">
+                        Save Target Areas
+                    </button>
+                </div>
+
+                <div class="mb-4">
+                    <button class="btn btn-light w-100 rounded-pill py-3 fw-bold text-danger shadow-sm border" onclick="app.logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i> Log Out
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="bottom-nav">
+            <a href="#" class="active" onclick="app.switchTab('home', this)">
+                <i class="fas fa-motorcycle"></i> Duty
+            </a>
+            <a href="#" id="navActiveTabBtn" onclick="app.switchTab('active', this)">
+                <div class="position-relative d-inline-block">
+                    <i class="fas fa-bolt"></i>
+                    <span id="navActiveBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.55rem; padding: 0.25rem 0.4rem; border: 2px solid white; display: none;">0</span>
+                </div>
+                Active
+            </a>
+            <a href="#" onclick="app.switchTab('history', this)">
+                <i class="fas fa-list-alt"></i> History
+            </a>
+            <a href="#" onclick="app.switchTab('finance', this)">
+                <i class="fas fa-wallet"></i> Finance
+            </a>
+            <a href="#" onclick="app.switchTab('profile', this)">
+                <i class="fas fa-user-circle"></i> Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    
+    <div class="modal fade" id="viewOrderModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewOrderModalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="otpModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Pickup Verification</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <p class="text-muted mb-4">Ask the SELLER for the 4-digit Pickup OTP.</p>
+                    <input type="number" class="form-control mx-auto w-75 text-center fw-bold fs-3 letter-spacing-lg py-3 rounded-4 border-2 border-primary" id="otpInput" placeholder="----" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);" style="letter-spacing: 15px;">
+                    <input type="hidden" id="otpOrderId">
+                    <button class="btn btn-theme w-100 mt-4 py-3 rounded-pill fw-bold fs-5" onclick="app.submitOTP()">CONFIRM PICKUP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="withdrawalModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Transfer to Bank</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <p class="text-muted mb-1">Available Earnings</p>
+                    <h2 class="fw-bold text-success mb-4" id="withdrawalModalAmount">₹0</h2>
+                    <div class="text-start mb-3">
+                        <label class="form-label fw-bold small text-muted">Bank Account Number</label>
+                        <input type="text" class="form-control py-3" id="withdrawAccountNo" placeholder="Enter Account Number" required>
+                    </div>
+                    <div class="text-start mb-4">
+                        <label class="form-label fw-bold small text-muted">IFSC Code</label>
+                        <input type="text" class="form-control py-3 text-uppercase" id="withdrawIfsc" placeholder="e.g. SBIN0001234" required>
+                    </div>
+                    <button class="btn btn-theme w-100 py-3 rounded-pill fw-bold" onclick="app.submitWithdrawal()">SUBMIT REQUEST</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="cashHandoverModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Submit Cash</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <p class="text-muted mb-1">Amount to pay</p>
+                    <h2 class="fw-bold text-danger mb-4" id="handoverModalAmount">₹0</h2>
+                    <div class="p-3 bg-light rounded-4 mb-4 border">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=ajonny@ptaxis&pn=AJonny%20Shop&cu=INR" alt="QR" class="img-fluid mb-3 rounded-4 shadow-sm" style="width: 140px; height: 140px;">
+                        <p class="mb-1 text-muted small fw-bold">Scan QR or Pay to UPI ID</p>
+                        <h6 class="fw-bold text-dark user-select-all mb-0 bg-white p-2 rounded-3 border d-inline-block">ajonny@ptaxis</h6>
+                    </div>
+                    <div class="mb-4 text-start">
+                        <label class="form-label fw-bold small text-muted">Enter UTR / Reference No.</label>
+                        <input type="text" class="form-control py-3" id="handoverUtrInput" placeholder="e.g. 312345678901" required>
+                    </div>
+                    <button class="btn btn-danger w-100 py-3 rounded-pill fw-bold" onclick="app.submitCashWithUTR()">SUBMIT DETAILS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATE MODAL (Premium 3D Popup like the Image) -->
+    <div id="updateModalOverlay" class="update-modal-overlay">
+        <div class="update-modal-card">
+            <button class="update-close-btn" id="updateCloseBtn" onclick="app.closeUpdateModal()"><i class="fas fa-times"></i></button>
+            
+            <div class="update-img-container">
+                <!-- Premium 3D Box/Rocket Image matching your style -->
+                <img src="https://cdn-icons-png.flaticon.com/512/3233/3233968.png" alt="Update Box Rocket">
+            </div>
+            
+            <h3 class="update-title">Update Available!</h3>
+            <p class="update-subtitle">A new version is here with exciting improvements and bug fixes.</p>
+            
+            <div class="update-version-box">
+                <div class="uv-icon"><i class="fas fa-star"></i></div>
+                <div class="uv-text">
+                    <h6 id="updateVersionText">Version 2.1.0</h6>
+                    <p id="updateDescText">Better performance, new features & improved stability.</p>
+                </div>
+            </div>
+            
+            <!-- Clicking this opens directly in Chrome using window.open -->
+            <button class="btn btn-update w-100" onclick="app.doUpdate()">Update Now</button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3 mt-2" style="z-index: 1055;"></div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // HARDCODE CURRENT APP VERSION
+        const APP_CURRENT_VERSION = "1.0.0";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnT0KgHBq8HnVb4QgETVhfo6oFo2WnMu0",
+            authDomain: "ajonny-shop-store.firebaseapp.com",
+            databaseURL: "https://ajonny-shop-store-default-rtdb.firebaseio.com",
+            projectId: "ajonny-shop-store",
+            storageBucket: "ajonny-shop-store.firebasestorage.app",
+            messagingSenderId: "536237083535",
+            appId: "1:536237083535:web:e4451dc73fbd31a70859fa"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        const app = {
+            user: null, profile: null, isOnline: false, isDashboardInitialized: false, isRegistering: false, localPickupAreas: [],
+            updateUrl: null, // Holds the dynamic update link from Admin
+            swipeData: { active: false, startX: 0, el: null, max: 0, type: null, orderId: null, extraData: null, isRTL: false },
+
+            init() {
+                this.checkForUpdates(); // Listen for admin update settings
+
+                auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => {
+                    auth.onAuthStateChanged((user) => {
+                        if (user) {
+                            this.user = user;
+                            if (!this.isRegistering) { document.getElementById('loader').style.display = 'flex'; this.verifyDriverAccount(); }
+                        } else {
+                            this.user = null; this.profile = null; this.isDashboardInitialized = false;
+                            this.showView('authView'); document.getElementById('loader').style.display = 'none';
+                        }
+                    });
+                });
+                document.getElementById('loginForm').addEventListener('submit', (e) => { e.preventDefault(); this.login(); });
+                document.getElementById('driverApplyForm').addEventListener('submit', (e) => { e.preventDefault(); this.register(); });
+                this.initSwipeEvents();
+            },
+
+            // --- APP UPDATE LOGIC (Controlled from Admin DB) ---
+            checkForUpdates() {
+                // Listens to 'settings/driver_app_update' in your Firebase DB
+                db.ref('settings/driver_app_update').on('value', snap => {
+                    const data = snap.val();
+                    if (data && data.version && this.isNewerVersion(APP_CURRENT_VERSION, data.version)) {
+                        this.showUpdateModal(data);
+                    } else {
+                        this.closeUpdateModal();
+                    }
+                });
+            },
+
+            isNewerVersion(oldVer, newVer) {
+                // Compares version numbers (e.g. 1.0.0 vs 2.1.0)
+                return newVer.localeCompare(oldVer, undefined, { numeric: true, sensitivity: 'base' }) > 0;
+            },
+
+            showUpdateModal(data) {
+                document.getElementById('updateVersionText').innerText = 'Version ' + data.version;
+                document.getElementById('updateDescText').innerText = data.description || 'Better performance, new features & improved stability.';
+                
+                // Set the URL link from admin
+                this.updateUrl = data.link || 'https://google.com';
+                
+                // Hide 'X' button if forceUpdate is true
+                document.getElementById('updateCloseBtn').style.display = data.forceUpdate ? 'none' : 'flex';
+                document.getElementById('updateModalOverlay').classList.add('show');
+            },
+
+            closeUpdateModal() {
+                document.getElementById('updateModalOverlay').classList.remove('show');
+            },
+
+            doUpdate() {
+                if (this.updateUrl) {
+                    // This forces the link to open directly in Google Chrome / Default Browser
+                    window.open(this.updateUrl, '_blank', 'noopener,noreferrer');
+                }
+            },
+
+            // --- Premium Slide Logic ---
+            initSwipeEvents() {
+                document.addEventListener('mousemove', (e) => this.moveSwipe(e));
+                document.addEventListener('touchmove', (e) => this.moveSwipe(e), {passive: false});
+                document.addEventListener('mouseup', () => this.endSwipe());
+                document.addEventListener('touchend', () => this.endSwipe());
+            },
+            startSwipe(e, el, type, orderId, extraData = null) {
+                this.swipeData.active = true; this.swipeData.el = el; this.swipeData.type = type;
+                this.swipeData.orderId = orderId; this.swipeData.extraData = extraData;
+                this.swipeData.startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const container = el.parentElement; this.swipeData.isRTL = container.classList.contains('rtl-swipe');
+                this.swipeData.max = container.offsetWidth - el.offsetWidth - 12; 
+                el.style.transition = 'none';
+                const overlay = container.querySelector('.swipe-overlay');
+                if(overlay) overlay.style.transition = 'none';
+            },
+            moveSwipe(e) {
+                if (!this.swipeData.active || !this.swipeData.el) return;
+                const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                let diff = currentX - this.swipeData.startX;
+                if(e.cancelable && Math.abs(diff) > 8) e.preventDefault(); 
+                if (this.swipeData.isRTL) {
+                    if (diff > 0) diff = 0; if (diff < -this.swipeData.max) diff = -this.swipeData.max;
+                } else {
+                    if (diff < 0) diff = 0; if (diff > this.swipeData.max) diff = this.swipeData.max;
+                }
+                this.swipeData.el.style.transform = `translateX(${diff}px)`;
+                const overlay = this.swipeData.el.parentElement.querySelector('.swipe-overlay');
+                if (overlay) overlay.style.width = (Math.abs(diff) + 30) + 'px'; 
+            },
+            endSwipe() {
+                if (!this.swipeData.active || !this.swipeData.el) return;
+                this.swipeData.active = false;
+                const el = this.swipeData.el; const container = el.parentElement;
+                const overlay = container.querySelector('.swipe-overlay');
+                const transformMatch = el.style.transform.match(/translateX\((.+)px\)/);
+                const diff = transformMatch ? parseFloat(transformMatch[1]) : 0;
+                
+                el.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                if(overlay) overlay.style.transition = 'width 0.3s ease-out';
+
+                const thresholdPassed = this.swipeData.isRTL ? diff < -this.swipeData.max * 0.75 : diff > this.swipeData.max * 0.75; 
+
+                if (thresholdPassed) {
+                    el.style.transform = `translateX(${this.swipeData.isRTL ? -this.swipeData.max : this.swipeData.max}px)`;
+                    if(overlay) overlay.style.width = '100%';
+                    const { type, orderId, extraData } = this.swipeData;
+                    setTimeout(() => {
+                        el.style.transform = 'translateX(0px)'; if(overlay) overlay.style.width = '0px';
+                        if (type === 'OTP') this.openOTPModal(orderId);
+                        else if (type === 'DELIVER') this.completeDelivery(orderId, false, 0);
+                        else if (type === 'COLLECT') this.completeDelivery(orderId, true, extraData);
+                        else if (type === 'REJECT') this.cancelDelivery(orderId);
+                    }, 350);
+                } else {
+                    el.style.transform = 'translateX(0px)'; if(overlay) overlay.style.width = '0px';
+                }
+                this.swipeData.el = null;
+            },
+
+            showView(viewId) {
+                document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+                document.getElementById(viewId).classList.add('active');
+            },
+
+            verifyDriverAccount() {
+                const driverRef = db.ref('drivers/' + this.user.uid);
+                driverRef.off();
+                driverRef.on('value', snap => {
+                    document.getElementById('loader').style.display = 'none';
+                    if (snap.exists()) {
+                        this.profile = snap.val();
+                        if (this.profile.status === 'verified') { this.showView('driverView'); this.initDashboard(); } 
+                        else {
+                            this.showView('pendingView');
+                            if (this.profile.status === 'rejected') {
+                                const alert = document.getElementById('rejectionAlert'); alert.style.display = 'block';
+                                alert.innerText = "KYC Rejected: " + (this.profile.rejectionReason || 'Contact Support');
+                            }
+                        }
+                    } else {
+                        if (!this.isRegistering) { this.showToast('You are not registered.', 'danger'); auth.signOut(); }
+                    }
+                }, () => { this.showToast('Network error.', 'warning'); document.getElementById('loader').style.display = 'none'; });
+            },
+
+            async login() {
+                const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPassword').value;
+                document.getElementById('loader').style.display = 'flex';
+                try { await auth.signInWithEmailAndPassword(e, p); } catch(err) { document.getElementById('loader').style.display = 'none'; this.showToast(err.message, 'danger'); }
+            },
+
+            async register() {
+                const email = document.getElementById('d_email').value, pass = document.getElementById('d_password').value;
+                document.getElementById('loader').style.display = 'flex'; this.isRegistering = true;
+                try {
+                    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                    await db.ref('drivers/' + cred.user.uid).set({
+                        name: document.getElementById('d_name').value, email: email, mobile: document.getElementById('d_mobile').value,
+                        dob: document.getElementById('d_dob').value, address: document.getElementById('d_address').value,
+                        emergencyContact: document.getElementById('d_emergency').value, vehicleType: document.getElementById('d_vehicleType').value,
+                        vehicleNumber: document.getElementById('d_vehicleNum').value, dlNumber: document.getElementById('d_dl').value,
+                        rcUrl: document.getElementById('d_rc').value, pan: document.getElementById('d_pan').value,
+                        bankUpi: document.getElementById('d_bankUpi').value, kycDoc: document.getElementById('d_kycDoc').value,
+                        walletBalance: 0, cashInHand: 0, totalCodCollected: 0, submittedCash: 0, pickupAreas: [], 
+                        status: 'pending', submittedAt: new Date().toISOString(), isOnline: false
+                    });
+                    this.showToast('KYC Application Submitted!', 'success');
+                    this.user = cred.user; this.verifyDriverAccount();
+                } catch(err) { this.showToast(err.message, 'danger'); document.getElementById('loader').style.display = 'none'; } 
+                finally { this.isRegistering = false; }
+            },
+
+            logout() { auth.signOut(); },
+
+            initDashboard() {
+                if (this.isDashboardInitialized) return; this.isDashboardInitialized = true;
+                const vehicleStr = `${this.profile.vehicleType} • ${this.profile.vehicleNumber}`;
+                document.getElementById('profName').innerText = this.profile.name;
+                document.getElementById('profVehicle').innerText = vehicleStr;
+                document.getElementById('profNameInfo').innerText = this.profile.name;
+                document.getElementById('profMobileInfo').innerText = this.profile.mobile || 'Not Provided';
+                document.getElementById('profVehicleInfo').innerText = vehicleStr;
+                this.localPickupAreas = this.profile.pickupAreas || []; this.renderPickupAreas();
+                document.getElementById('driverOnlineToggle').checked = this.profile.isOnline;
+                this.toggleStatus(this.profile.isOnline, true);
+                
+                db.ref('drivers/' + this.user.uid).on('value', snap => {
+                    const p = snap.val() || {};
+                    document.getElementById('d_walletBalance').innerText = '₹' + (p.walletBalance || 0).toLocaleString();
+                    document.getElementById('d_cashInHand').innerText = '₹' + (p.cashInHand || 0).toLocaleString();
+                    document.getElementById('d_totalCod').innerText = '₹' + (p.totalCodCollected || 0).toLocaleString();
+                    document.getElementById('d_submittedCash').innerText = '₹' + (p.submittedCash || 0).toLocaleString();
+                });
+                this.listenToCodHistory(); this.listenToWithdrawalHistory();
+            },
+
+            switchTab(tabId, el) {
+                document.querySelectorAll('.driver-tab').forEach(t => t.style.display = 'none');
+                document.getElementById('tab_' + tabId).style.display = 'block';
+                document.querySelectorAll('.bottom-nav a').forEach(a => a.classList.remove('active'));
+                if(el) el.classList.add('active');
+            },
+
+            renderPickupAreas() {
+                const container = document.getElementById('pickupAreasList');
+                if (!this.localPickupAreas || this.localPickupAreas.length === 0) {
+                    container.innerHTML = `<div class="w-100 text-center p-3 text-muted border rounded-4 border-dashed bg-white"><small>No Areas Selected</small></div>`; return;
+                }
+                container.innerHTML = this.localPickupAreas.map((area, index) => {
+                    const stateClass = area.active ? 'bg-primary bg-opacity-10 text-primary border-primary' : 'bg-light text-muted border-secondary';
+                    const icon = area.active ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-circle opacity-50"></i>';
+                    return `
+                    <div class="badge rounded-pill border py-2 px-3 ${stateClass}" style="font-size: 13px; font-weight:500;">
+                        <span onclick="app.togglePickupArea(${index})" style="cursor:pointer;">${icon} ${area.name}</span>
+                        <i class="fas fa-times ms-2 text-danger" style="cursor:pointer;" onclick="app.removePickupArea(${index})"></i>
+                    </div>`;
+                }).join('');
+            },
+            addPickupArea() {
+                const name = document.getElementById('newAreaInput').value.trim();
+                if (name) {
+                    if (this.localPickupAreas.some(a => a.name.toLowerCase() === name.toLowerCase())) return this.showToast('Already added!', 'warning');
+                    this.localPickupAreas.push({ name: name, active: true }); document.getElementById('newAreaInput').value = ''; this.renderPickupAreas();
+                }
+            },
+            togglePickupArea(index) { this.localPickupAreas[index].active = !this.localPickupAreas[index].active; this.renderPickupAreas(); },
+            removePickupArea(index) { this.localPickupAreas.splice(index, 1); this.renderPickupAreas(); },
+            async savePickupAreas() {
+                if (!this.user) return;
+                await db.ref('drivers/' + this.user.uid).update({ pickupAreas: this.localPickupAreas });
+                this.profile.pickupAreas = this.localPickupAreas; this.showToast('Pickup Areas saved!', 'success');
+                if (this.isOnline) { db.ref('orders').off(); this.listenToOrders(); }
+            },
+
+            async toggleStatus(isOnline, skipDbUpdate = false) {
+                this.isOnline = isOnline;
+                document.getElementById('driverStatusWarning').style.display = isOnline ? 'none' : 'block';
+                if (!skipDbUpdate) await db.ref('drivers/' + this.user.uid).update({ isOnline: isOnline });
+                if (isOnline) this.listenToOrders(); 
+                else {
+                    db.ref('orders').off(); 
+                    document.getElementById('driverRequestsList').innerHTML = `<div class="text-center py-4"><i class="fas fa-power-off text-muted fs-1 mb-2"></i><p class="text-muted fw-bold">You are offline.</p></div>`;
+                }
+            },
+
+            showScanningUI() {
+                document.getElementById('driverRequestsList').innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary mb-3" role="status"></div><p class="text-muted fw-bold mb-1">Scanning for orders...</p></div>`;
+            },
+
+            listenToOrders() {
+                db.ref('orders').on('value', snap => {
+                    const data = snap.val();
+                    if(!data) { this.showScanningUI(); return; }
+                    const allOrders = Object.values(data);
+                    const myOrders = allOrders.filter(o => o.driverId === this.user.uid);
+                    
+                    const history = myOrders.filter(o => ['Delivered', 'Cancelled'].includes((o.status || '').trim())).sort((a,b) => b.statusUpdatedAt - a.statusUpdatedAt);
+                    this.renderDriverHistory(history);
+                    
+                    const todayDelivered = history.filter(o => o.status === 'Delivered');
+                    document.getElementById('d_statToday').innerText = todayDelivered.length;
+                    document.getElementById('d_statEarn').innerText = `₹${todayDelivered.length * 40}`;
+
+                    const activeOrders = myOrders.filter(o => ['Driver Assigned', 'Picked Up', 'Out for Delivery'].includes((o.status || '').trim())).sort((a,b) => b.statusUpdatedAt - a.statusUpdatedAt);
+                    const badge = document.getElementById('navActiveBadge');
+                    
+                    if (activeOrders.length > 0) {
+                        document.getElementById('activeJobCount').innerText = activeOrders.length;
+                        badge.innerText = activeOrders.length; badge.style.display = 'block';
+                        this.renderActiveDeliveries(activeOrders);
+                    } else {
+                        document.getElementById('activeJobCount').innerText = '0'; badge.style.display = 'none';
+                        document.getElementById('activeDeliveriesContainer').innerHTML = `<div class="text-center py-5"><i class="fas fa-box-open text-muted fs-1 mb-3"></i><p class="text-muted fw-bold">No active jobs.</p></div>`;
+                    }
+                    
+                    const driverAreas = this.profile.pickupAreas || [];
+                    const activeAreas = driverAreas.filter(a => a.active).map(a => a.name.toLowerCase().trim());
+                    
+                    const reqs = allOrders.filter(o => {
+                        if ((o.status || '').trim() !== 'Ready for Pickup' || o.driverId || activeAreas.length === 0) return false;
+                        const pArea = (o.pickupArea || '').toLowerCase(); const pAddr = (o.pickupAddress || '').toLowerCase();
+                        return activeAreas.some(area => pArea.includes(area) || pAddr.includes(area));
+                    });
+
+                    document.getElementById('availableRequestsSection').style.display = 'block';
+                    if(!reqs.length) this.showScanningUI(); else this.renderAvailableRequests(reqs);
+                });
+            },
+
+            renderAvailableRequests(reqs) {
+                document.getElementById('driverRequestsList').innerHTML = reqs.map(r => {
+                    const city = (r.deliveryAddress && r.deliveryAddress.city) ? r.deliveryAddress.city : 'Customer Area';
+                    const pin = (r.deliveryAddress && r.deliveryAddress.pincode) ? r.deliveryAddress.pincode : '';
+                    let pickup = r.pickupAddress || r.pickupArea || 'AJonny Seller';
+                    if (typeof pickup === 'string' && pickup.trim().startsWith(',')) pickup = pickup.replace(/^,\s*/, '');
+                    
+                    const payBadge = r.paymentMethod === 'ONLINE' ? `<span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="fas fa-check-circle me-1"></i> PAID</span>` : `<span class="badge bg-warning bg-opacity-25 text-dark border border-warning">COD ₹${r.codAmount}</span>`;
+
+                    return `
+                    <div class="delivery-card">
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                            <div><small class="text-muted fw-bold">#${r.orderId}</small><br>${payBadge}</div>
+                            <div><span class="badge bg-dark bg-opacity-10 text-dark px-3 py-2 border rounded-pill">Earn: ₹40</span></div>
+                        </div>
+                        <div class="location-track">
+                            <div class="loc-point">
+                                <i class="fas fa-dot-circle text-primary"></i>
+                                <small class="text-muted d-block fw-bold" style="font-size:11px;">PICKUP</small>
+                                <span class="fw-bold text-dark" style="font-size:14px;">${pickup}</span>
+                            </div>
+                            <div class="loc-point mb-0">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <small class="text-muted d-block fw-bold" style="font-size:11px;">DROP</small>
+                                <span class="fw-bold text-dark" style="font-size:14px;">${city}, ${pin}</span>
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-3 pt-3 border-top">
+                            <div class="col-6"><button class="btn btn-light w-100 py-2 rounded-pill fw-bold border shadow-sm" onclick="app.viewOrderDetails('${r.orderId}')"><i class="fas fa-eye"></i> View</button></div>
+                            <div class="col-6"><button class="btn btn-theme w-100 py-2 rounded-pill fw-bold" onclick="app.acceptDelivery('${r.orderId}')"><i class="fas fa-check"></i> Accept</button></div>
+                        </div>
+                    </div>`;
+                }).join('');
+            },
+
+            async viewOrderDetails(orderId) {
+                const snap = await db.ref('orders/' + orderId).once('value'); const o = snap.val(); if(!o) return;
+                let itemsStr = o.cart && o.cart.length ? o.cart.map(i => `• <b>${i.name}</b> (Qty: ${i.qty || 1})`).join('<br>') : (o.productName ? `• <b>${o.productName}</b>` : 'Not specified');
+                let pickupArea = o.pickupArea || o.storeName || 'AJonny Seller'; let pickupAddr = (o.pickupAddress || 'Not Provided').replace(/^,\s*/, '');
+                const deliveryArea = (o.deliveryAddress && o.deliveryAddress.city) ? o.deliveryAddress.city : 'Customer Area';
+                const deliveryAddr = o.deliveryAddress ? `${o.deliveryAddress.road || ''}, ${o.deliveryAddress.city || ''} - ${o.deliveryAddress.pincode || ''}` : 'Not Provided';
+
+                document.getElementById('viewOrderModalBody').innerHTML = `
+                    <div class="mb-3 border-bottom pb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted fw-bold">ID: #${o.orderId}</span>
+                            <span class="badge bg-warning text-dark px-3 py-2 shadow-sm rounded-pill">${o.status || 'Ready'}</span>
+                        </div>
+                    </div>
+                    <div class="mb-3"><small class="text-muted fw-bold text-uppercase d-block mb-1">Products</small><div class="bg-light p-2 rounded-3 small border">${itemsStr}</div></div>
+                    <div class="mb-3"><small class="text-primary fw-bold text-uppercase d-block mb-1">Pickup From</small><div class="small"><strong>${pickupArea}</strong><br>${pickupAddr}</div></div>
+                    <div class="mb-4"><small class="text-danger fw-bold text-uppercase d-block mb-1">Drop To</small><div class="small"><strong>${deliveryArea}</strong><br>${deliveryAddr}</div></div>
+                `;
+                new bootstrap.Modal(document.getElementById('viewOrderModal')).show();
+            },
+
+            async acceptDelivery(orderId) {
+                const ref = db.ref('orders/' + orderId); const snap = await ref.once('value'); const order = snap.val();
+                if (order && !order.driverId) {
+                    await ref.update({ driverId: this.user.uid, driverName: this.profile.name, driverPhone: this.profile.mobile, status: 'Driver Assigned', statusUpdatedAt: Date.now() });
+                    this.showToast('Job Accepted!', 'success'); this.switchTab('active', document.getElementById('navActiveTabBtn'));
+                } else this.showToast('Order was assigned to another driver.', 'warning');
+            },
+
+            renderActiveDeliveries(activeOrders) {
+                document.getElementById('activeDeliveriesContainer').innerHTML = activeOrders.map(o => {
+                    let actionArea = ''; const stat = (o.status || '').trim(); const isCod = o.paymentMethod === 'COD';
+                    const sellerMobile = o.sellerPhone || o.storePhone || 'Not Provided'; const storeName = o.storeName || 'Seller';
+                    
+                    if (stat === 'Driver Assigned') {
+                        actionArea = `
+                            <div class="p-3 mt-3 rounded-4 bg-light border border-secondary border-opacity-25">
+                                <h6 class="mb-1 fw-bold text-dark"><i class="fas fa-store text-primary"></i> Step 1: Pickup</h6>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <small class="text-muted">Contact: <strong>${sellerMobile}</strong></small>
+                                    <a href="tel:${sellerMobile}" class="btn btn-sm btn-success rounded-circle shadow-sm" style="width:35px;height:35px;"><i class="fas fa-phone mt-1"></i></a>
+                                </div>
+                            </div>
+                            <div class="swipe-container mt-4"><div class="swipe-overlay"></div><span class="swipe-text">SWIPE TO PICKUP <i class="fas fa-angles-right ms-2"></i></span><div class="swipe-thumb" onmousedown="app.startSwipe(event, this, 'OTP', '${o.orderId}')" ontouchstart="app.startSwipe(event, this, 'OTP', '${o.orderId}')"><i class="fas fa-motorcycle"></i></div></div>
+                            <div class="swipe-container reject rtl-swipe mt-3"><div class="swipe-overlay"></div><span class="swipe-text"><i class="fas fa-angles-left me-2"></i> REJECT</span><div class="swipe-thumb" onmousedown="app.startSwipe(event, this, 'REJECT', '${o.orderId}')" ontouchstart="app.startSwipe(event, this, 'REJECT', '${o.orderId}')"><i class="fa-solid fa-xmark"></i></div></div>
+                        `;
+                    } else if (stat === 'Picked Up' || stat === 'Out for Delivery') {
+                        if(stat === 'Picked Up') db.ref('orders/'+o.orderId).update({status: 'Out for Delivery'});
+                        let deliverySwipeAction = isCod ? 
+                            `<div class="swipe-container mt-4"><div class="swipe-overlay"></div><span class="swipe-text">COLLECT & DELIVER <i class="fas fa-angles-right ms-2"></i></span><div class="swipe-thumb" onmousedown="app.startSwipe(event, this, 'COLLECT', '${o.orderId}', ${o.codAmount})" ontouchstart="app.startSwipe(event, this, 'COLLECT', '${o.orderId}', ${o.codAmount})"><i class="fas fa-rupee-sign"></i></div></div>` :
+                            `<div class="swipe-container mt-4"><div class="swipe-overlay"></div><span class="swipe-text">MARK DELIVERED <i class="fas fa-angles-right ms-2"></i></span><div class="swipe-thumb" onmousedown="app.startSwipe(event, this, 'DELIVER', '${o.orderId}')" ontouchstart="app.startSwipe(event, this, 'DELIVER', '${o.orderId}')"><i class="fas fa-check"></i></div></div>`;
+
+                        actionArea = `
+                            <div class="p-3 mt-3 rounded-4 bg-light border border-secondary border-opacity-25">
+                                <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-home text-danger"></i> Step 2: Drop-Off</h6>
+                            </div>
+                            ${deliverySwipeAction}
+                            <div class="swipe-container reject rtl-swipe mt-3"><div class="swipe-overlay"></div><span class="swipe-text"><i class="fas fa-angles-left me-2"></i> CANCEL</span><div class="swipe-thumb" onmousedown="app.startSwipe(event, this, 'REJECT', '${o.orderId}')" ontouchstart="app.startSwipe(event, this, 'REJECT', '${o.orderId}')"><i class="fa-solid fa-xmark"></i></div></div>
+                        `;
+                    }
+
+                    const cMob = o.deliveryAddress?.mobile || ''; const cName = o.deliveryAddress?.name || 'Customer';
+                    const cRoad = o.deliveryAddress?.road || ''; const cCity = o.deliveryAddress?.city || '';
+                    let pickupAddr = (o.pickupAddress || o.pickupArea || '').replace(/^,\s*/, '');
+                    const paymentPill = isCod ? `<div class="d-flex justify-content-between p-3 rounded-3 mt-3" style="background:#fff0f1; border:1px dashed #ffcdd2;"><span class="text-danger fw-bold">Collect COD:</span><span class="fs-5 fw-bold text-danger">₹${o.codAmount}</span></div>` : `<div class="p-3 rounded-3 mt-3 text-center" style="background:#e8f5e9; border:1px dashed #a5d6a7;"><span class="fw-bold text-success"><i class="fas fa-check-circle me-1"></i> PAID ONLINE</span></div>`;
+
+                    return `
+                        <div class="delivery-card">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                                <div><small class="text-muted fw-bold d-block" style="font-size: 11px;">ORDER ID</small><h6 class="mb-0 fw-bold text-dark">#${o.orderId}</h6></div>
+                                <a href="tel:${cMob}" class="btn btn-outline-success rounded-circle shadow-sm" style="width: 44px; height: 44px; padding-top: 8px;"><i class="fas fa-phone-alt fs-5"></i></a>
+                            </div>
+                            <div class="location-track">
+                                <div class="loc-point"><i class="fas fa-circle text-primary" style="font-size:12px; left:-29px;"></i><small class="text-muted fw-bold d-block" style="font-size:11px;">PICKUP</small><strong class="text-dark d-block">${storeName}</strong><span class="text-muted small">${pickupAddr}</span></div>
+                                <div class="loc-point mb-0"><i class="fas fa-map-marker-alt text-danger" style="font-size:16px; left:-31px;"></i><small class="text-muted fw-bold d-block" style="font-size:11px;">DROP-OFF</small><strong class="text-dark d-block">${cName}</strong><span class="text-muted small">${cRoad}, ${cCity}</span></div>
+                            </div>
+                            ${paymentPill} ${actionArea}
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            openOTPModal(orderId) { document.getElementById('otpOrderId').value = orderId; document.getElementById('otpInput').value = ''; new bootstrap.Modal(document.getElementById('otpModal')).show(); },
+            
+            async submitOTP() {
+                const orderId = document.getElementById('otpOrderId').value, inputOtp = document.getElementById('otpInput').value;
+                if (inputOtp.length !== 4) return this.showToast('Enter 4-digit OTP', 'warning');
+                const snap = await db.ref('orders/' + orderId).once('value');
+                if (snap.val().pickupOtp === inputOtp) {
+                    await db.ref('orders/' + orderId).update({ status: 'Picked Up', statusUpdatedAt: Date.now() });
+                    bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide(); this.showToast('Picked Up! Proceed to Drop.', 'success');
+                } else this.showToast('Incorrect OTP.', 'danger');
+            },
+
+            async completeDelivery(orderId, isCod, codAmount) {
+                let msg = isCod ? `Did you collect ₹${codAmount} CASH from the customer?` : `Confirm package handed over to customer.`;
+                if(confirm(msg)) {
+                    const updates = { status: 'Delivered', statusUpdatedAt: Date.now() };
+                    if(isCod) updates.paymentStatus = 'COD_COLLECTED';
+                    await db.ref('orders/' + orderId).update(updates);
+                    
+                    const driverUpdates = { walletBalance: (this.profile.walletBalance || 0) + 40 };
+                    if(isCod) {
+                        driverUpdates.cashInHand = (this.profile.cashInHand || 0) + codAmount;
+                        driverUpdates.totalCodCollected = (this.profile.totalCodCollected || 0) + codAmount;
+                        await db.ref('cod_collections').push({ driverId: this.user.uid, orderId: orderId, amount: codAmount, timestamp: Date.now(), status: 'Pending Handover' });
+                    }
+                    await db.ref('drivers/' + this.user.uid).update(driverUpdates);
+                    this.showToast(`Delivery Completed! ₹40 Earned.`, 'success');
+                }
+            },
+
+            async cancelDelivery(orderId) {
+                if(confirm("Cancel this delivery job?")) {
+                    const snap = await db.ref('orders/' + orderId).once('value'); const order = snap.val();
+                    if (order && order.status === 'Driver Assigned') {
+                        await db.ref('orders/' + orderId).update({ driverId: null, driverName: null, driverPhone: null, status: 'Ready for Pickup', statusUpdatedAt: Date.now() });
+                        this.showToast('Job Rejected.', 'warning');
+                    } else {
+                        await db.ref('orders/' + orderId).update({ status: 'Cancelled', cancelReason: 'Driver Cancelled', statusUpdatedAt: Date.now() });
+                        this.showToast('Delivery Cancelled.', 'danger');
+                    }
+                }
+            },
+
+            renderDriverHistory(history) {
+                const list = document.getElementById('driverHistoryList');
+                if(!history.length) return list.innerHTML = `<div class="text-center py-5"><i class="fas fa-box-open fs-1 text-muted mb-3"></i><p class="text-muted fw-bold">No history.</p></div>`;
+                list.innerHTML = history.map(h => {
+                    const isCancelled = h.status === 'Cancelled';
+                    return `
+                    <div class="card border-0 shadow-sm rounded-4 mb-3" style="border-left: 5px solid ${isCancelled ? '#ef4444' : '#10b981'} !important;">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong class="text-dark">#${h.orderId}</strong>
+                                <span class="badge ${isCancelled ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success'}">${h.status}</span>
+                            </div>
+                            <small class="text-muted d-block mb-2"><i class="far fa-clock"></i> ${new Date(h.statusUpdatedAt).toLocaleString()}</small>
+                            ${isCancelled ? `<div class="bg-light rounded p-2 text-center text-danger fw-bold small">Cancelled</div>` : `<div class="bg-success bg-opacity-10 rounded p-2 text-center text-success fw-bold small"><i class="fas fa-check-circle me-1"></i>+ ₹40 Earned</div>`}
+                        </div>
+                    </div>`;
+                }).join('');
+            },
+
+            listenToCodHistory() { db.ref('cod_handovers').orderByChild('driverId').equalTo(this.user.uid).on('value', snap => { const d = snap.val(); const l = d ? Object.values(d) : []; l.sort((a,b) => b.timestamp - a.timestamp); this.renderCodHistory(l); }); },
+            renderCodHistory(history) {
+                const c = document.getElementById('codHistoryList');
+                if(!history.length) return c.innerHTML = '<p class="text-muted text-center py-3">No collections.</p>';
+                c.innerHTML = history.map(h => `<div class="list-group-item d-flex justify-content-between align-items-center py-3 border-bottom"><div class="small"><strong class="d-block text-dark">Cash Handover</strong><span class="text-muted">${new Date(h.timestamp).toLocaleString()}</span>${h.utrNumber ? `<br>UTR: ${h.utrNumber}` : ''}</div><div class="text-end"><strong class="d-block fs-6 text-dark">₹${h.amount}</strong><span class="badge ${h.status === 'Pending' ? 'bg-warning text-dark' : 'bg-success'}">${h.status}</span></div></div>`).join('');
+            },
+
+            listenToWithdrawalHistory() { db.ref('withdrawals').orderByChild('uid').equalTo(this.user.uid).on('value', snap => { const d = snap.val(); const l = d ? Object.values(d) : []; l.sort((a,b) => b.timestamp - a.timestamp); this.renderWithdrawalHistory(l); }); },
+            renderWithdrawalHistory(history) {
+                const c = document.getElementById('driverTransactions');
+                if(!history.length) return c.innerHTML = '<p class="text-muted text-center py-3">No transactions.</p>';
+                c.innerHTML = history.map(h => `<div class="list-group-item d-flex justify-content-between align-items-center py-3 border-bottom"><div class="small"><strong class="d-block text-dark">Bank Transfer</strong><span class="text-muted">${new Date(h.timestamp).toLocaleString()}</span>${h.accountNumber ? `<br>A/C: ****${h.accountNumber.slice(-4)}` : ''}</div><div class="text-end"><strong class="d-block fs-6 text-dark">₹${h.amount}</strong><span class="badge ${h.status === 'Pending' ? 'bg-warning text-dark' : (h.status === 'Approved' ? 'bg-success' : 'bg-danger')}">${h.status}</span></div></div>`).join('');
+            },
+
+            requestWithdrawal() {
+                const bal = this.profile.walletBalance || 0;
+                if(bal < 100) return this.showToast('Minimum withdrawal is ₹100', 'warning');
+                document.getElementById('withdrawalModalAmount').innerText = '₹' + bal; document.getElementById('withdrawAccountNo').value = ''; document.getElementById('withdrawIfsc').value = '';
+                new bootstrap.Modal(document.getElementById('withdrawalModal')).show();
+            },
+            async submitWithdrawal() {
+                const bal = this.profile.walletBalance || 0; if(bal < 100) return;
+                const acNo = document.getElementById('withdrawAccountNo').value.trim(), ifsc = document.getElementById('withdrawIfsc').value.trim().toUpperCase();
+                if(!acNo || !ifsc) return this.showToast('Enter Account details.', 'warning');
+                try {
+                    document.getElementById('loader').style.display = 'flex';
+                    await db.ref('withdrawals').push({ uid: this.user.uid, role: 'driver', amount: bal, accountNumber: acNo, ifscCode: ifsc, status: 'Pending', timestamp: Date.now() });
+                    await db.ref('drivers/' + this.user.uid).update({walletBalance: 0});
+                    document.getElementById('loader').style.display = 'none'; bootstrap.Modal.getInstance(document.getElementById('withdrawalModal')).hide(); this.showToast('Withdrawal request submitted!', 'success');
+                } catch(e) { document.getElementById('loader').style.display = 'none'; this.showToast(e.message, 'danger'); }
+            },
+
+            requestCashHandover() {
+                const cash = this.profile.cashInHand || 0;
+                if(cash <= 0) return this.showToast('No COD cash in hand.', 'warning');
+                document.getElementById('handoverModalAmount').innerText = '₹' + cash; document.getElementById('handoverUtrInput').value = '';
+                new bootstrap.Modal(document.getElementById('cashHandoverModal')).show();
+            },
+            async submitCashWithUTR() {
+                const cash = this.profile.cashInHand || 0; if(cash <= 0) return;
+                const utr = document.getElementById('handoverUtrInput').value.trim();
+                if(!utr || utr.length < 6) return this.showToast('Enter valid UTR.', 'warning');
+                try {
+                    document.getElementById('loader').style.display = 'flex';
+                    await db.ref('cod_handovers').push({ driverId: this.user.uid, amount: cash, utrNumber: utr, status: 'Pending', timestamp: Date.now() });
+                    await db.ref('drivers/' + this.user.uid).update({ cashInHand: 0, submittedCash: (this.profile.submittedCash || 0) + cash });
+                    document.getElementById('loader').style.display = 'none'; bootstrap.Modal.getInstance(document.getElementById('cashHandoverModal')).hide(); this.showToast('Submitted successfully.', 'success');
+                } catch(e) { document.getElementById('loader').style.display = 'none'; this.showToast(e.message, 'danger'); }
+            },
+
+            showToast(message, type = 'info') {
+                const bgClass = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning text-dark' : 'bg-primary';
+                const toastHtml = `<div class="toast align-items-center text-white ${bgClass} border-0 rounded-pill shadow-lg" role="alert" aria-live="assertive" aria-atomic="true"><div class="d-flex px-3 py-2"><div class="toast-body fw-bold">${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div></div>`;
+                const container = document.querySelector('.toast-container'); container.insertAdjacentHTML('beforeend', toastHtml);
+                const toastEl = container.lastElementChild; new bootstrap.Toast(toastEl, { delay: 3000 }).show(); setTimeout(() => toastEl.remove(), 3500);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+</html>
